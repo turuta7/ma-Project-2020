@@ -30,7 +30,7 @@ exports.up = (knex) => {
       .notNullable()
       .defaultTo(0);
     table.timestamps(true, true);
-    table.unique(['fullname']);
+    table.unique(['email']);
   });
 };
 

@@ -4,6 +4,6 @@ const users = require('./users');
 
 const router = new Router();
 
-router.use('/users', users.routes());
+router.use('/api/users', users.routes());
 
 module.exports = router;

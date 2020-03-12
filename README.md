@@ -1,7 +1,10 @@
 MA-Project-2020_back-end
 
-#1 start docker
+# start project
 docker-compose up -d
 
-#2 start:
-npm start;
+API Endpoint: ../users/
+method: get post put delete
+
+API Endpoint: ../users/login - return id and new token
+method: get
