@@ -12,10 +12,9 @@ const router = new Router();
 const saltRounds = 10;
 
 // get email. Check password. return id, and token (id, fullname)
-router.get('/login', async (ctx) => {
+router.post('/login', async (ctx) => {
   const object = ctx.request.body;
-  ctx.assert(object.email && object.password, 400, 'not entered data');
-
+  this.assert(object.email && object.password, 400, 'not entered data');
   const getUser = async () => {
     return new Promise((resolve) => {
       knex('users')
@@ -48,50 +47,58 @@ router.get('/login', async (ctx) => {
         });
     });
   };
-  await getUser();
+  try {
+    await getUser();
+  } catch (error) {
+    console.error(error);
+  }
   return null;
 });
 
 // Post user. return id and token (id, fullname)
 router.post('/', async (ctx) => {
   const object = ctx.request.body;
-  ctx.assert(object.email && object.password, 400, 'not entered data');
+  this.assert(object.email && object.password, 400, 'not entered data');
   const userCreate = async () => {
     return new Promise((resolve) => {
       bcrypt.genSalt(saltRounds, (err, salt) => {
         bcrypt.hash(object.password, salt, (e, hash) => {
           object.password = hash;
-          knex('users')
-            .insert(object)
-            .then((result) => {
-              console.log(result);
-              knex('users')
-                .where('email', object.email)
-                .then((res) => {
-                  console.log(res[0].id);
-                  jwt.sign(
-                    { id: res[0].id, fullname: object.fullname },
-                    process.env.privateKeyToken,
-                    (ee, token) => {
-                      console.error(ee);
-                      resolve((ctx.body = { user_id: res[0].id, token }));
-                    },
-                  );
-                });
-            })
-            .catch((er) => {
-              console.error(er);
-              ctx.status = 403;
-              resolve((ctx.body = { user: 'User create error' }));
-            });
         });
       });
+      knex('users')
+        .insert(object)
+        .then((result) => {
+          console.log(result);
+          knex('users')
+            .where('email', object.email)
+            .then((res) => {
+              console.log(res[0].id);
+              jwt.sign(
+                { id: res[0].id, fullname: object.fullname },
+                process.env.privateKeyToken,
+                (ee, token) => {
+                  console.error(ee);
+                  resolve((ctx.body = { user_id: res[0].id, token }));
+                },
+              );
+            });
+        })
+        .catch((er) => {
+          console.error(er);
+          ctx.status = 403;
+          resolve((ctx.body = { user: 'User create error' }));
+        });
     });
   };
-
-  await userCreate();
+  try {
+    await userCreate();
+  } catch (error) {
+    console.error(error);
+  }
   return null;
 });
+
 // Get users
 router.get('/', async (ctx) => {
   const getUser = async () => {
@@ -121,9 +128,14 @@ router.get('/', async (ctx) => {
         });
     });
   };
-  await getUser();
+  try {
+    await getUser();
+  } catch (error) {
+    console.error(error);
+  }
   return null;
 });
+
 // Ger user by id
 router.get('/:id', async (ctx) => {
   const idUser = ctx.params.id;
@@ -166,14 +178,19 @@ router.get('/:id', async (ctx) => {
         });
     });
   };
-  await getUserId();
+  try {
+    await getUserId();
+  } catch (error) {
+    console.error(error);
+  }
   return null;
 });
+
 // Update user by id
 router.put('/:id', async (ctx) => {
   const object = ctx.request.body;
   const idUser = ctx.params.id;
-  ctx.assert(object.email && object.password && idUser, 400, 'not entered data');
+  this.assert(object.email && object.password && idUser, 400, 'not entered data');
   const id = Number(idUser);
   // authorization user by token and by id
   const autUser = await authorizationUser(ctx);
@@ -204,9 +221,14 @@ router.put('/:id', async (ctx) => {
         });
     });
   };
-  await updateUserId();
+  try {
+    await updateUserId();
+  } catch (error) {
+    console.error(error);
+  }
   return null;
 });
+
 // Delete user by id
 router.delete('/:id', async (ctx) => {
   const idUser = ctx.params.id;
@@ -240,7 +262,11 @@ router.delete('/:id', async (ctx) => {
         });
     });
   };
-  await deleteUserId();
+  try {
+    await deleteUserId();
+  } catch (error) {
+    console.error(error);
+  }
   return null;
 });
 

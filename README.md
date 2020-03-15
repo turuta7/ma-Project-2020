@@ -7,4 +7,4 @@ API Endpoint: ../users/
 method: get post put delete
 
 API Endpoint: ../users/login - return id and new token
-method: get
+method: post
