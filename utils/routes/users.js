@@ -14,7 +14,7 @@ const saltRounds = 10;
 // get email. Check password. return id, and token (id, fullname)
 router.post('/login', async (ctx) => {
   const object = ctx.request.body;
-  this.assert(object.email && object.password, 400, 'not entered data');
+  ctx.assert(object.email && object.password, 400, 'not entered data');
   const getUser = async () => {
     return new Promise((resolve) => {
       knex('users')
@@ -58,7 +58,7 @@ router.post('/login', async (ctx) => {
 // Post user. return id and token (id, fullname)
 router.post('/', async (ctx) => {
   const object = ctx.request.body;
-  this.assert(object.email && object.password, 400, 'not entered data');
+  ctx.assert(object.email && object.password, 400, 'not entered data');
   const userCreate = async () => {
     return new Promise((resolve) => {
       bcrypt.genSalt(saltRounds, (err, salt) => {
@@ -190,7 +190,7 @@ router.get('/:id', async (ctx) => {
 router.put('/:id', async (ctx) => {
   const object = ctx.request.body;
   const idUser = ctx.params.id;
-  this.assert(object.email && object.password && idUser, 400, 'not entered data');
+  ctx.assert(object.email && object.password && idUser, 400, 'not entered data');
   const id = Number(idUser);
   // authorization user by token and by id
   const autUser = await authorizationUser(ctx);
