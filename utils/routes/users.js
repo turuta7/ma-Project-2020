@@ -29,7 +29,7 @@ router.post('/login', async (ctx) => {
             bcrypt.compare(object.password, result.password, (err, res) => {
               if (res) {
                 jwt.sign(
-                  { id: res.id, fullname: res.fullname },
+                  { id: result.id, fullname: result.fullname },
                   process.env.privateKeyToken,
                   (ee, token) => {
                     resolve((ctx.body = { user_id: result.id, token }));
@@ -64,31 +64,32 @@ router.post('/', async (ctx) => {
       bcrypt.genSalt(saltRounds, (err, salt) => {
         bcrypt.hash(object.password, salt, (e, hash) => {
           object.password = hash;
+
+          knex('users')
+            .insert(object)
+            .then((result) => {
+              console.log(result);
+              knex('users')
+                .where('email', object.email)
+                .then((res) => {
+                  console.log(res[0].id);
+                  jwt.sign(
+                    { id: res[0].id, fullname: object.fullname },
+                    process.env.privateKeyToken,
+                    (ee, token) => {
+                      console.error(ee);
+                      resolve((ctx.body = { user_id: res[0].id, token }));
+                    },
+                  );
+                });
+            })
+            .catch((er) => {
+              console.error(er);
+              ctx.status = 403;
+              resolve((ctx.body = { user: 'User create error' }));
+            });
         });
       });
-      knex('users')
-        .insert(object)
-        .then((result) => {
-          console.log(result);
-          knex('users')
-            .where('email', object.email)
-            .then((res) => {
-              console.log(res[0].id);
-              jwt.sign(
-                { id: res[0].id, fullname: object.fullname },
-                process.env.privateKeyToken,
-                (ee, token) => {
-                  console.error(ee);
-                  resolve((ctx.body = { user_id: res[0].id, token }));
-                },
-              );
-            });
-        })
-        .catch((er) => {
-          console.error(er);
-          ctx.status = 403;
-          resolve((ctx.body = { user: 'User create error' }));
-        });
     });
   };
   try {
