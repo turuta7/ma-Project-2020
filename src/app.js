@@ -1,7 +1,7 @@
 const knexMigrate = require('knex-migrate');
 const startServer = require('../utils/server');
 
-knexMigrate('up', {})
+knexMigrate('up', { step: 2 })
   .then(async (res) => {
     console.log(res);
     console.log('DB connection ok ');

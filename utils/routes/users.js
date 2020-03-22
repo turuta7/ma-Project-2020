@@ -48,7 +48,9 @@ router.post('/', async (ctx) => {
     ? await jwt.sign({ id: returnCreateUser.id }, process.env.privateKeyToken)
     : null;
   ctx.status = returnCreateUser ? 200 : 403;
-  ctx.body = token ? { user_id: returnCreateUser.id, token } : { message: 'user in db' };
+  ctx.body = token
+    ? { user_id: returnCreateUser.id, token }
+    : { message: 'User in db/Incorrect data' };
   return null;
 });
 
@@ -58,13 +60,13 @@ router.get('/', async (ctx) => {
   const autUser = await authorizationUser(ctx);
   if (!autUser.status) {
     ctx.status = 403;
-    ctx.body = { message: 'you are not authorized' };
+    ctx.body = { message: 'You are not authorized' };
     return null;
   }
 
   const users = await getAllUserByKey();
   if (users.length === 0) {
-    ctx.body = { message: 'no user DB' };
+    ctx.body = { message: 'No user DB' };
     return null;
   }
   ctx.body = users;
@@ -80,12 +82,12 @@ router.get('/:id', async (ctx) => {
   const autUser = await authorizationUser(ctx);
   if (!autUser.status || id !== autUser.id) {
     ctx.status = 403;
-    ctx.body = { message: 'you are not authorized' };
+    ctx.body = { message: 'You are not authorized' };
     return null;
   }
 
   const user = await getOneUserByKey('id', id);
-  const returnUser = user || { message: 'user not DB' };
+  const returnUser = user || { message: 'User not DB' };
   ctx.body = returnUser;
   return null;
 });
@@ -100,7 +102,7 @@ router.put('/:id', async (ctx) => {
   const autUser = await authorizationUser(ctx);
   if (!autUser.status || id !== autUser.id) {
     ctx.status = 403;
-    ctx.body = { message: 'you are not authorized' };
+    ctx.body = { message: 'You are not authorized' };
     return null;
   }
   if (requestBody.password) {
@@ -110,8 +112,8 @@ router.put('/:id', async (ctx) => {
   const updateUser = await updateUserByKey('id', id, requestBody);
   const returnUpdateUser =
     updateUser === 1
-      ? { message: 'user update ok' }
-      : { message: 'user not DB or users email unique' };
+      ? { message: 'User update ok' }
+      : { message: 'User not DB/User email unique/Incorrect data' };
   ctx.body = returnUpdateUser;
   return null;
 });
@@ -125,13 +127,13 @@ router.delete('/:id', async (ctx) => {
   const autUser = await authorizationUser(ctx);
   if (!autUser.status || id !== autUser.id) {
     ctx.status = 403;
-    ctx.body = { message: 'you are not authorized' };
+    ctx.body = { message: 'You are not authorized' };
     return null;
   }
 
   const deleteUser = await deleteUserByKey('id', id);
   const returnDeleteUser =
-    deleteUser === 1 ? { message: 'user update ok' } : { message: 'user not DB' };
+    deleteUser === 1 ? { message: 'User delete ok' } : { message: 'User not DB' };
   console.log(deleteUser);
   ctx.body = returnDeleteUser;
   return null;

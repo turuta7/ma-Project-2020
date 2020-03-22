@@ -13,6 +13,9 @@ const objectSelect = [
   'workLongitude',
 ];
 
+const objectSelectCarts = ['id', 'model', 'license', 'userId'];
+
+// method user
 const getOneUserByKey = (index, key, object = objectSelect) => {
   return knex('users')
     .where(`${index}`, key)
@@ -48,10 +51,35 @@ const createUserDb = (object) => {
     .catch((err) => console.error(err));
 };
 
+// method: cars user
+const createCarsUser = (object) => {
+  return knex('cars')
+    .insert(object)
+    .catch((err) => console.error(err));
+};
+
+const getAllUserCardById = (id) => {
+  return knex('cars')
+    .where('userId', id)
+    .select(objectSelectCarts)
+    .catch((err) => console.error(err));
+};
+
+const deleteCarsUserById = (idUser = 0, idCar) => {
+  return knex('cars')
+    .where('userId', idUser)
+    .where('id', idCar)
+    .delete()
+    .catch((err) => console.error(err));
+};
+
 module.exports = {
   getOneUserByKey,
   getAllUserByKey,
   deleteUserByKey,
   updateUserByKey,
   createUserDb,
+  createCarsUser,
+  getAllUserCardById,
+  deleteCarsUserById,
 };
