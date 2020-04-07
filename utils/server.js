@@ -23,7 +23,8 @@ async function startServer() {
 
   app.use(rootRouter.routes()).use(rootRouter.allowedMethods());
   app.use((ctx) => {
-    ctx.body = { message: 'server work' };
+    ctx.status = 404;
+    ctx.body = { message: 'No endpoint' };
   });
 
   app.listen(process.env.SERVER_PORT, () =>
