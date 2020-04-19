@@ -2,16 +2,16 @@ const Router = require('@koa/router');
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { error500 } = require('../errorProcessing');
+const { error500 } = require('../../utils/errorProcessing');
 
-const authorizationUser = require('../authorization');
+const authorizationUser = require('../../utils/authorization');
 const {
   getOneUserByKey,
   getAllUserByKey,
   deleteUserByKey,
   updateUserByKey,
   createUserDb,
-} = require('../workMethodDB');
+} = require('../../utils/workMethodDB');
 
 const router = new Router();
 

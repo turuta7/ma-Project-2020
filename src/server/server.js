@@ -7,7 +7,6 @@ const rootRouter = require('./routes'); // All our routes are here
 
 require('dotenv').config();
 
-// const config = require('../config');
 async function startServer() {
   const app = new Koa();
 
@@ -21,10 +20,24 @@ async function startServer() {
   app.use(cors(corsOptions));
   app.use(bodyParser());
 
+  // Error handling as simple as try/catch
+  app.use(async (ctx, next) => {
+    try {
+      await next();
+    } catch (err) {
+      ctx.status = err.status || 500;
+      if (err.expose) {
+        ctx.body = { error: err.message };
+      }
+      ctx.app.emit('error', err, ctx);
+    }
+  });
+
   app.use(rootRouter.routes()).use(rootRouter.allowedMethods());
-  app.use((ctx) => {
-    ctx.status = 404;
-    ctx.body = { message: 'No endpoint' };
+
+  // Error logging
+  app.on('error', async (err) => {
+    console.error('Something went wrong!', err);
   });
 
   app.listen(process.env.SERVER_PORT, () =>

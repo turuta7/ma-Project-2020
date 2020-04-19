@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const DB = require('../knexfile')[process.env.NODE_ENV];
+const DB = require('../../knexfile')[process.env.NODE_ENV];
 
 const config = {
   DB,

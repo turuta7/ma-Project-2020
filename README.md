@@ -1,7 +1,7 @@
 MA-Project-2020_back-end
 
 # start project
-docker-compose up -d
+# docker-compose up -d
 
 API Endpoint: ../users/
 method: get/post/put/delete
@@ -11,3 +11,5 @@ method: post
 
 API Endpoint: ../users/:id/cars/  (:idCar)
 method: get/post/delete
+----------------------
+

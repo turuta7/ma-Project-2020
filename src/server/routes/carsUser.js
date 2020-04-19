@@ -1,11 +1,11 @@
 const Router = require('@koa/router');
-const { error500 } = require('../errorProcessing');
+const { error500 } = require('../../utils/errorProcessing');
 const {
   getOneUserByKey,
   createCarsUser,
   getAllUserCardById,
   deleteCarsUserById,
-} = require('../workMethodDB');
+} = require('../../utils/workMethodDB');
 
 const router = new Router();
 

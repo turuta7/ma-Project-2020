@@ -10,6 +10,7 @@
   "rules": {
     "no-console":"off",
     "prefer-rest-params":"off",
-    "max-classes-per-file": ["error", 2]
+    "max-classes-per-file": ["error", 2],
+    "camelcase":"off"
     }
 }
