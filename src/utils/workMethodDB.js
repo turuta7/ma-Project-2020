@@ -11,6 +11,8 @@ const objectSelect = [
   'homeLongitude',
   'workLatitude',
   'workLongitude',
+  'homeAddress',
+  'workAddress',
 ];
 
 const objectSelectCarts = ['id', 'model', 'license', 'userId'];

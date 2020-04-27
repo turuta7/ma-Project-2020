@@ -79,7 +79,20 @@ router.get('/', async (ctx) => {
       ctx.body = { message: 'No user DB' };
       return null;
     }
-    ctx.body = users;
+
+    const newBody = users.map((data) => {
+      return {
+        id: data.id,
+        fullname: data.fullname,
+        email: data.email,
+        homeLocation: [data.homeLatitude, data.homeLongitude],
+        workLocation: [data.workLatitude, data.workLongitude],
+        homeAddress: data.homeAddress,
+        workAddress: data.workAddress,
+      };
+    });
+
+    ctx.body = newBody;
   } catch (error) {
     error500(ctx, error);
   }
@@ -100,10 +113,25 @@ router.get('/:id', async (ctx) => {
       ctx.body = { message: 'You are not authorized' };
       return null;
     }
-
     const user = await getOneUserByKey('id', id);
-    const returnUser = user || { message: 'User not DB' };
-    ctx.body = returnUser;
+    if (!user) {
+      ctx.status = 400;
+      ctx.body = { message: 'User not DB' };
+      return null;
+    }
+    const newBody = user.map((data) => {
+      return {
+        id: data.id,
+        fullname: data.fullname,
+        email: data.email,
+        homeLocation: [data.homeLatitude, data.homeLongitude],
+        workLocation: [data.workLatitude, data.workLongitude],
+        homeAddress: data.homeAddress,
+        workAddress: data.workAddress,
+      };
+    });
+
+    ctx.body = newBody;
   } catch (error) {
     error500(ctx, error);
   }
