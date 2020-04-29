@@ -3,6 +3,7 @@ const Router = require('@koa/router');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { error500 } = require('../../utils/errorProcessing');
+const { UserFactory, UserSchemeFactory } = require('../../utils/factory/user');
 
 const authorizationUser = require('../../utils/authorization');
 const {
@@ -41,12 +42,13 @@ router.post('/login', async (ctx) => {
 // Post user. return id and token (id)
 router.post('/', async (ctx) => {
   const requestBody = ctx.request.body;
+  console.log(requestBody);
 
   ctx.assert(requestBody.email && requestBody.password, 400, 'Missing login/password');
   try {
     const hashPassword = await bcrypt.hash(requestBody.password, saltRounds);
     requestBody.password = hashPassword;
-    const createUser = await createUserDb(requestBody);
+    const createUser = await createUserDb(await UserSchemeFactory(requestBody));
     const returnCreateUser = createUser
       ? await getOneUserByKey('email', requestBody.email)
       : undefined;
@@ -59,20 +61,11 @@ router.post('/', async (ctx) => {
       ctx.body = { message: 'User in db/Incorrect data' };
       return;
     }
-    ctx.body = {
-      id: returnCreateUser.id,
-      token,
-      email: returnCreateUser.email,
-      fullname: returnCreateUser.fullname,
-      homeLocation: [Number(returnCreateUser.homeLatitude), Number(returnCreateUser.homeLongitude)],
-      workLocation: [Number(returnCreateUser.workLatitude), Number(returnCreateUser.workLongitude)],
-      homeAddress: Number(returnCreateUser.homeAddress),
-      workAddress: Number(returnCreateUser.workAddress),
-    };
-    // }
-    // ctx.body = token
-    //   ? { user_id: returnCreateUser.id, token }
-    //   : { message: 'User in db/Incorrect data' };
+    console.log(returnCreateUser);
+    if (token) returnCreateUser.token = token;
+    const newBody = await UserFactory(returnCreateUser);
+    console.log(newBody);
+    ctx.body = newBody;
   } catch (error) {
     error500(ctx, error);
   }
@@ -95,8 +88,9 @@ router.get('/', async (ctx) => {
       ctx.body = { message: 'No user DB' };
       return null;
     }
-
-    ctx.body = users;
+    const newUsers = users.map((data) => UserFactory(data));
+    console.log(newUsers);
+    ctx.body = newUsers;
   } catch (error) {
     error500(ctx, error);
   }
@@ -118,8 +112,9 @@ router.get('/:id', async (ctx) => {
       return null;
     }
     const user = await getOneUserByKey('id', id);
-    const returnUser = user || { message: 'User not DB' };
-    ctx.body = returnUser;
+    const newUsers = await UserFactory(user);
+    console.log(newUsers);
+    ctx.body = newUsers;
   } catch (error) {
     error500(ctx, error);
   }
