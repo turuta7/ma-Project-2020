@@ -50,17 +50,35 @@ router.post('/', async (ctx) => {
     const returnCreateUser = createUser
       ? await getOneUserByKey('email', requestBody.email)
       : undefined;
+    console.log(returnCreateUser);
+
     const token = returnCreateUser
       ? await jwt.sign({ id: returnCreateUser.id }, process.env.privateKeyToken)
       : null;
     ctx.status = returnCreateUser ? 200 : 403;
-    ctx.body = token
-      ? { user_id: returnCreateUser.id, token }
-      : { message: 'User in db/Incorrect data' };
+    if (token == null) {
+      ctx.status = 403;
+      ctx.body = { message: 'User in db/Incorrect data' };
+      return;
+    }
+    ctx.body = {
+      id: returnCreateUser.id,
+      token,
+      email: returnCreateUser.email,
+      fullname: returnCreateUser.fullname,
+      homeLocation: [returnCreateUser.homeLatitude, returnCreateUser.homeLongitude],
+      workLocation: [returnCreateUser.workLatitude, returnCreateUser.workLongitude],
+      homeAddress: returnCreateUser.homeAddress,
+      workAddress: returnCreateUser.workAddress,
+    };
+    // }
+    // ctx.body = token
+    //   ? { user_id: returnCreateUser.id, token }
+    //   : { message: 'User in db/Incorrect data' };
   } catch (error) {
     error500(ctx, error);
   }
-  return null;
+  //  return null;
 });
 
 // Get users
@@ -80,19 +98,7 @@ router.get('/', async (ctx) => {
       return null;
     }
 
-    const newBody = users.map((data) => {
-      return {
-        id: data.id,
-        fullname: data.fullname,
-        email: data.email,
-        homeLocation: [data.homeLatitude, data.homeLongitude],
-        workLocation: [data.workLatitude, data.workLongitude],
-        homeAddress: data.homeAddress,
-        workAddress: data.workAddress,
-      };
-    });
-
-    ctx.body = newBody;
+    ctx.body = users;
   } catch (error) {
     error500(ctx, error);
   }
@@ -114,24 +120,8 @@ router.get('/:id', async (ctx) => {
       return null;
     }
     const user = await getOneUserByKey('id', id);
-    if (!user) {
-      ctx.status = 400;
-      ctx.body = { message: 'User not DB' };
-      return null;
-    }
-    const newBody = user.map((data) => {
-      return {
-        id: data.id,
-        fullname: data.fullname,
-        email: data.email,
-        homeLocation: [data.homeLatitude, data.homeLongitude],
-        workLocation: [data.workLatitude, data.workLongitude],
-        homeAddress: data.homeAddress,
-        workAddress: data.workAddress,
-      };
-    });
-
-    ctx.body = newBody;
+    const returnUser = user || { message: 'User not DB' };
+    ctx.body = returnUser;
   } catch (error) {
     error500(ctx, error);
   }
