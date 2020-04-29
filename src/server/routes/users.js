@@ -50,8 +50,6 @@ router.post('/', async (ctx) => {
     const returnCreateUser = createUser
       ? await getOneUserByKey('email', requestBody.email)
       : undefined;
-    console.log(returnCreateUser);
-
     const token = returnCreateUser
       ? await jwt.sign({ id: returnCreateUser.id }, process.env.privateKeyToken)
       : null;
@@ -66,10 +64,10 @@ router.post('/', async (ctx) => {
       token,
       email: returnCreateUser.email,
       fullname: returnCreateUser.fullname,
-      homeLocation: [returnCreateUser.homeLatitude, returnCreateUser.homeLongitude],
-      workLocation: [returnCreateUser.workLatitude, returnCreateUser.workLongitude],
-      homeAddress: returnCreateUser.homeAddress,
-      workAddress: returnCreateUser.workAddress,
+      homeLocation: [Number(returnCreateUser.homeLatitude), Number(returnCreateUser.homeLongitude)],
+      workLocation: [Number(returnCreateUser.workLatitude), Number(returnCreateUser.workLongitude)],
+      homeAddress: Number(returnCreateUser.homeAddress),
+      workAddress: Number(returnCreateUser.workAddress),
     };
     // }
     // ctx.body = token
