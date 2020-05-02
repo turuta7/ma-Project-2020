@@ -45,12 +45,16 @@ const updateUserByKey = (index, key, object = {}) => {
     .where(`${index}`, key)
     .first()
     .update(object)
+    .returning(objectSelect)
+    .then((user) => user[0])
     .catch((err) => console.error(err));
 };
 
 const createUserDb = (object = {}) => {
   return knex('users')
     .insert(object)
+    .returning(objectSelect)
+    .then((user) => user[0])
     .catch((err) => console.error(err));
 };
 

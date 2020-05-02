@@ -29,6 +29,7 @@ const UserFactory = ({
 
 const UserSchemeFactory = ({
   email,
+  password,
   fullname = '',
   homeAddress = '',
   homeLocation = [0, 0],
@@ -38,6 +39,7 @@ const UserSchemeFactory = ({
   const user = {
     email,
     fullname,
+    password,
     homeAddress,
     homeLatitude: homeLocation[0],
     homeLongitude: homeLocation[1],

@@ -32,7 +32,8 @@ router.post('/login', async (ctx) => {
     const isValidPassword = bcrypt.compareSync(requestBody.password, user.password);
     const token = isValidPassword ? jwt.sign({ id: user.id }, process.env.privateKeyToken) : null;
     ctx.status = isValidPassword ? 200 : 403;
-    ctx.body = token ? { user_id: user.id, token } : { message: 'Invalid password' };
+    const newBody = UserFactory(user);
+    ctx.body = token ? newBody : { message: 'Invalid password' };
   } catch (error) {
     error500(ctx, error);
   }
@@ -48,23 +49,18 @@ router.post('/', async (ctx) => {
   try {
     const hashPassword = await bcrypt.hash(requestBody.password, saltRounds);
     requestBody.password = hashPassword;
-    const createUser = await createUserDb(await UserSchemeFactory(requestBody));
-    const returnCreateUser = createUser
-      ? await getOneUserByKey('email', requestBody.email)
-      : undefined;
-    const token = returnCreateUser
-      ? await jwt.sign({ id: returnCreateUser.id }, process.env.privateKeyToken)
+    const createUser = await createUserDb(UserSchemeFactory(requestBody));
+    const token = createUser
+      ? await jwt.sign({ id: createUser.id }, process.env.privateKeyToken)
       : null;
-    ctx.status = returnCreateUser ? 200 : 403;
+    ctx.status = createUser ? 200 : 403;
     if (token == null) {
       ctx.status = 403;
       ctx.body = { message: 'User in db/Incorrect data' };
       return;
     }
-    console.log(returnCreateUser);
-    if (token) returnCreateUser.token = token;
-    const newBody = await UserFactory(returnCreateUser);
-    console.log(newBody);
+    if (token) createUser.token = token;
+    const newBody = UserFactory(createUser);
     ctx.body = newBody;
   } catch (error) {
     error500(ctx, error);
@@ -89,7 +85,6 @@ router.get('/', async (ctx) => {
       return null;
     }
     const newUsers = users.map((data) => UserFactory(data));
-    console.log(newUsers);
     ctx.body = newUsers;
   } catch (error) {
     error500(ctx, error);
@@ -140,11 +135,14 @@ router.put('/:id', async (ctx) => {
       const hashPassword = await bcrypt.hash(requestBody.password, saltRounds);
       requestBody.password = hashPassword;
     }
-    const updateUser = await updateUserByKey('id', id, requestBody);
-    const returnUpdateUser =
-      updateUser === 1
-        ? { message: 'User update ok' }
-        : { message: 'User not DB/User email unique/Incorrect data' };
+
+    const updateUser = await updateUserByKey('id', id, UserSchemeFactory(requestBody));
+    console.log(updateUser);
+
+    const returnUpdateUser = updateUser
+      ? UserFactory(updateUser)
+      : { message: 'User not DB/User email unique/Incorrect data' };
+
     ctx.body = returnUpdateUser;
   } catch (error) {
     error500(ctx, error);
