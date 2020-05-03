@@ -33,6 +33,7 @@ router.post('/login', async (ctx) => {
     const token = isValidPassword ? jwt.sign({ id: user.id }, process.env.privateKeyToken) : null;
     ctx.status = isValidPassword ? 200 : 403;
     const newBody = UserFactory(user);
+    if (token) newBody.token = token;
     ctx.body = token ? newBody : { message: 'Invalid password' };
   } catch (error) {
     error500(ctx, error);
