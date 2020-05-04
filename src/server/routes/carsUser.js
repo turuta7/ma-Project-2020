@@ -1,4 +1,6 @@
 const Router = require('@koa/router');
+const authorizationUser = require('../../utils/authorization');
+const { carFactory } = require('../../utils/factory/cars');
 const { error500 } = require('../../utils/errorProcessing');
 const {
   getOneUserByKey,
@@ -11,14 +13,26 @@ const router = new Router();
 
 router.get('/', async (ctx) => {
   const { id } = ctx.params;
+
   try {
+    // authorization user by token and by id
+    const autUser = await authorizationUser(ctx);
+    if (!autUser.status || Number(id) !== autUser.id) {
+      ctx.status = 403;
+      ctx.body = { message: 'You are not authorized' };
+      return null;
+    }
+
     const allCarsUser = await getAllUserCardById(id);
-    const returnCarsUser = allCarsUser || { message: 'message: User no cars' };
+    const returnCarFactory = allCarsUser.map((x) => carFactory(x));
+    const returnCarsUser = returnCarFactory || { message: 'message: User no cars' };
     ctx.body = returnCarsUser;
   } catch (error) {
     error500(ctx, error);
   }
+  return null;
 });
+
 router.post('/', async (ctx) => {
   const { id } = ctx.params;
   const requestBody = ctx.request.body;
@@ -41,12 +55,21 @@ router.post('/', async (ctx) => {
 router.delete('/:idCar', async (ctx) => {
   const { id, idCar } = ctx.params;
   try {
+    // authorization user by token and by id
+    const autUser = await authorizationUser(ctx);
+    if (!autUser.status || Number(id) !== autUser.id) {
+      ctx.status = 403;
+      ctx.body = { message: 'You are not authorized' };
+      return null;
+    }
+
     const testDeleteUser = await deleteCarsUserById(id, idCar);
-    const response = testDeleteUser ? { message: 'delete car' } : { message: 'no cars user' };
-    ctx.body = response;
+    if (!testDeleteUser) console.error('no cars user in DB');
+    ctx.body = { message: `delete car ${idCar}` };
   } catch (error) {
     error500(ctx, error);
   }
+  return null;
 });
 
 module.exports = router;

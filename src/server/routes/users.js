@@ -109,7 +109,6 @@ router.get('/:id', async (ctx) => {
     }
     const user = await getOneUserByKey('id', id);
     const newUsers = await UserFactory(user);
-    console.log(newUsers);
     ctx.body = newUsers;
   } catch (error) {
     error500(ctx, error);
