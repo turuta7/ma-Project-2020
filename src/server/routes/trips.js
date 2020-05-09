@@ -1,5 +1,6 @@
 const Router = require('@koa/router');
 const Knex = require('knex');
+const { TripFactory, TripSchemeFactory } = require('../../utils/factory/trips');
 const { error500 } = require('../../utils/errorProcessing');
 
 const {
@@ -23,8 +24,10 @@ router.get('/testTrips', async (ctx) => {
       .select('*')
       .catch((err) => console.error(err));
   };
-  const res = await getTrips();
-  ctx.body = res;
+
+  const returnObject = await getTrips();
+  const newBody = returnObject.map((x) => TripFactory(x));
+  ctx.body = newBody;
 });
 
 router.get('/testPassengers', async (ctx) => {
@@ -34,6 +37,8 @@ router.get('/testPassengers', async (ctx) => {
       .catch((err) => console.error(err));
   };
   const res = await getSub();
+  console.log(res);
+
   ctx.body = res;
 });
 
@@ -41,19 +46,12 @@ router.get('/testPassengers', async (ctx) => {
 
 router.post('/', async (ctx) => {
   const requestBody = ctx.request.body;
-  ctx.assert(
-    requestBody.driverId &&
-      requestBody.carId &&
-      requestBody.startLatitude &&
-      requestBody.startLongitude &&
-      requestBody.route,
-    400,
-    'error data',
-  );
+  ctx.assert(requestBody.driverId && requestBody.route, 400, 'error data');
 
   try {
-    await createTrips(requestBody);
-    ctx.body = { message: 'create ok' };
+    requestBody.route = JSON.stringify(requestBody.route);
+    const returnObject = await createTrips(TripSchemeFactory(requestBody));
+    ctx.body = TripFactory(returnObject);
   } catch (error) {
     error500(ctx, error);
   }

@@ -72,6 +72,16 @@ const getAllUserCardById = (id) => {
     .catch((err) => console.error(err));
 };
 
+const getOneUserCardById = (idUser = 0, idCar) => {
+  console.log(idUser, idCar);
+
+  return knex('cars')
+    .where('userId', idUser)
+    .where('id', idCar)
+    .first()
+    .catch((err) => console.error(err));
+};
+
 const deleteCarsUserById = (idUser = 0, idCar) => {
   return knex('cars')
     .where('userId', idUser)
@@ -85,6 +95,8 @@ const deleteCarsUserById = (idUser = 0, idCar) => {
 const createTrips = (requestBody = {}) => {
   return knex('trips')
     .insert(requestBody)
+    .returning('*')
+    .then((user) => user[0])
     .catch((err) => console.error(err));
 };
 
@@ -117,6 +129,7 @@ module.exports = {
   createUserDb,
   createCarsUser,
   getAllUserCardById,
+  getOneUserCardById,
   deleteCarsUserById,
   createTrips,
   createSubscribe,
