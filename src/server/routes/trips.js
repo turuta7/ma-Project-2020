@@ -1,7 +1,9 @@
 const Router = require('@koa/router');
 const Knex = require('knex');
 const { TripFactory, TripSchemeFactory } = require('../../utils/factory/trips');
+const { subscribeFactory } = require('../../utils/factory/subscribe');
 const { error500 } = require('../../utils/errorProcessing');
+const { getOneUserCardById, getTripsById } = require('../../utils/workMethodDB');
 
 const {
   createSubscribe,
@@ -27,6 +29,8 @@ router.get('/testTrips', async (ctx) => {
 
   const returnObject = await getTrips();
   const newBody = returnObject.map((x) => TripFactory(x));
+  console.log(newBody);
+
   ctx.body = newBody;
 });
 
@@ -43,14 +47,23 @@ router.get('/testPassengers', async (ctx) => {
 });
 
 //---------------------
+router.get('/:id', async (ctx) => {
+  const { id } = ctx.params;
+  const returnObject = await getTripsById(id);
+  const returnCar = await getOneUserCardById(returnObject.driverId, returnObject.carId);
+  returnObject.car = returnCar;
+  const newBody = TripFactory(returnObject);
+  ctx.body = newBody;
+});
 
 router.post('/', async (ctx) => {
   const requestBody = ctx.request.body;
-  ctx.assert(requestBody.driverId && requestBody.route, 400, 'error data');
+  ctx.assert(requestBody.driverId && requestBody.route && requestBody.car.id, 400, 'error data');
 
   try {
     requestBody.route = JSON.stringify(requestBody.route);
     const returnObject = await createTrips(TripSchemeFactory(requestBody));
+    returnObject.car = { id: returnObject.carId };
     ctx.body = TripFactory(returnObject);
   } catch (error) {
     error500(ctx, error);
@@ -61,9 +74,11 @@ router.post('/:trip_id/subscribe', async (ctx) => {
   const requestBody = ctx.request.body;
   ctx.assert(requestBody.passengerId, requestBody.waypoint, 400, 'error data');
   requestBody.tripId = ctx.params.trip_id;
+  console.log(requestBody);
+
   try {
     const response = await createSubscribe(requestBody);
-    ctx.body = response;
+    ctx.body = subscribeFactory(response);
   } catch (error) {
     error500(ctx, error);
   }

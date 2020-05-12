@@ -73,8 +73,6 @@ const getAllUserCardById = (id) => {
 };
 
 const getOneUserCardById = (idUser = 0, idCar) => {
-  console.log(idUser, idCar);
-
   return knex('cars')
     .where('userId', idUser)
     .where('id', idCar)
@@ -103,6 +101,8 @@ const createTrips = (requestBody = {}) => {
 const createSubscribe = (object = {}) => {
   return knex('passengers')
     .insert(object)
+    .returning('*')
+    .then((user) => user[0])
     .catch((err) => console.error(err));
 };
 
@@ -121,6 +121,13 @@ const deleteTripById = (key) => {
     .catch((err) => console.error(err));
 };
 
+const getTripsById = async (id) => {
+  return knex('trips')
+    .where('id', id)
+    .then((trips) => trips[0])
+    .catch((err) => console.error(err));
+};
+
 module.exports = {
   getOneUserByKey,
   getAllUserByKey,
@@ -135,4 +142,5 @@ module.exports = {
   createSubscribe,
   deleteSubscribe,
   deleteTripById,
+  getTripsById,
 };

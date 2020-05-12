@@ -1,5 +1,5 @@
 const { carFactory } = require('./cars');
-// const { PassengerFactory } = require('./passenger');
+
 const TripFactory = ({
   id,
   driverId,
@@ -7,7 +7,6 @@ const TripFactory = ({
   startLatitude,
   startLongitude,
   seatsTotal,
-  // passengers = [],
   car = {},
   route,
 }) => {
@@ -19,7 +18,6 @@ const TripFactory = ({
       start: [Number(startLatitude), Number(startLongitude)],
       seatsTotal,
       car: carFactory(car),
-      // seatsLeft: Number(seatsTotal, 10) - passengers.length,
       route: JSON.parse(route),
     };
     return trip;
@@ -37,8 +35,6 @@ const TripSchemeFactory = ({
   car = {},
   route = [],
 }) => {
-  console.log('xer', car.id);
-
   try {
     const trip = {
       driverId,

@@ -1,6 +1,6 @@
-const carFactory = ({ id = '', model = '', license = '' }) => {
+const carFactory = ({ id, model = '', license = '' }) => {
   const cars = {
-    id,
+    id: Number(id),
     model,
     license,
   };
