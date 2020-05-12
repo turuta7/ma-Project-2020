@@ -3,13 +3,16 @@ const Knex = require('knex');
 const { TripFactory, TripSchemeFactory } = require('../../utils/factory/trips');
 const { subscribeFactory } = require('../../utils/factory/subscribe');
 const { error500 } = require('../../utils/errorProcessing');
-const { getOneUserCardById, getTripsById } = require('../../utils/workMethodDB');
+// const { getOneUserCardById, getTripsById } = require('../../utils/workMethodDB');
 
 const {
+  getOneUserCardById,
   createSubscribe,
   createTrips,
   deleteSubscribe,
   deleteTripById,
+  getTripsById,
+  getPassengersByTripId,
 } = require('../../utils/workMethodDB');
 
 const dbOptions = require('../../config/config').DB;
@@ -72,11 +75,18 @@ router.post('/', async (ctx) => {
 
 router.post('/:trip_id/subscribe', async (ctx) => {
   const requestBody = ctx.request.body;
+  const tripId = ctx.params.trip_id;
   ctx.assert(requestBody.passengerId, requestBody.waypoint, 400, 'error data');
-  requestBody.tripId = ctx.params.trip_id;
-  console.log(requestBody);
-
   try {
+    const trip = await getTripsById(tripId);
+    const tripSeatsTotal = trip.seatsTotal;
+    const passengers = await getPassengersByTripId(tripId);
+    if (passengers.length >= tripSeatsTotal) {
+      ctx.status = 400;
+      ctx.body = { message: 'Sorry, free seats are over.' };
+      return null;
+    }
+    requestBody.tripId = tripId;
     const response = await createSubscribe(requestBody);
     ctx.body = subscribeFactory(response);
   } catch (error) {
