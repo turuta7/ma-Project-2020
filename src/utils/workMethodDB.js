@@ -128,6 +128,13 @@ const getTripsById = async (id) => {
     .catch((err) => console.error(err));
 };
 
+const getPassengersByTripId = (id) => {
+  return knex('passengers')
+    .where('tripId', id)
+    .select('*')
+    .catch((err) => console.error(err));
+};
+
 module.exports = {
   getOneUserByKey,
   getAllUserByKey,
@@ -143,4 +150,5 @@ module.exports = {
   deleteSubscribe,
   deleteTripById,
   getTripsById,
+  getPassengersByTripId,
 };
