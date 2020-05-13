@@ -64,6 +64,8 @@ router.post('/', async (ctx) => {
     requestBody.route = JSON.stringify(requestBody.route);
     const returnObject = await createTrips(TripSchemeFactory(requestBody));
     returnObject.car = { id: returnObject.carId };
+    const returnCar = await getOneUserCardById(returnObject.driverId, returnObject.carId);
+    returnObject.car = returnCar;
     ctx.body = TripFactory(returnObject);
   } catch (error) {
     error500(ctx, error);
