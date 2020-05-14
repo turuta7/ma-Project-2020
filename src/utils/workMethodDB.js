@@ -121,6 +121,13 @@ const deleteTripById = (key) => {
     .catch((err) => console.error(err));
 };
 
+// get all trips include cars
+const getAllTrips = async () => {
+  return knex('trips')
+    .innerJoin('cars', 'trips.id', 'cars.id')
+    .catch((err) => console.error(err));
+};
+
 const getTripsById = async (id) => {
   return knex('trips')
     .where('id', id)
@@ -149,6 +156,7 @@ module.exports = {
   createSubscribe,
   deleteSubscribe,
   deleteTripById,
+  getAllTrips,
   getTripsById,
   getPassengersByTripId,
 };
