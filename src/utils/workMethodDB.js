@@ -123,8 +123,22 @@ const deleteTripById = (key) => {
 
 // get all trips include cars
 const getAllTrips = async () => {
-  return knex('trips')
-    .innerJoin('cars', 'trips.id', 'cars.id')
+  return knex
+    .select(
+      'trips.id',
+      'trips.departureTime',
+      'trips.driverId',
+      'trips.startLatitude',
+      'trips.startLongitude',
+      'trips.seatsTotal',
+      'trips.carId',
+      'trips.route',
+      'cars.model',
+      'cars.license',
+      'cars.userId',
+    )
+    .from('trips')
+    .join('cars', 'cars.id', 'trips.carId')
     .catch((err) => console.error(err));
 };
 
