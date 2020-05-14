@@ -12,6 +12,7 @@ const {
   deleteSubscribe,
   deleteTripById,
   getTripsById,
+  getAllTrips,
   getPassengersByTripId,
 } = require('../../utils/workMethodDB');
 
@@ -24,16 +25,8 @@ const router = new Router();
 // ---------delete
 
 router.get('/testTrips', async (ctx) => {
-  const getTrips = () => {
-    return knex('trips')
-      .select('*')
-      .catch((err) => console.error(err));
-  };
-
-  const returnObject = await getTrips();
+  const returnObject = await getAllTrips();
   const newBody = returnObject.map((x) => TripFactory(x));
-  console.log(newBody);
-
   ctx.body = newBody;
 });
 
