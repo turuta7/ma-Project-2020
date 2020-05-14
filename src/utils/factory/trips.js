@@ -7,10 +7,7 @@ const TripFactory = ({
   startLatitude,
   startLongitude,
   seatsTotal,
-  carId,
-  model,
-  license,
-  car = { id: carId, model, license } || {},
+  car = {},
   route,
 }) => {
   try {
