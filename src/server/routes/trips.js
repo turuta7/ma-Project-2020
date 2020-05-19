@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 const Router = require('@koa/router');
 const Knex = require('knex');
 const { TripFactory, TripSchemeFactory } = require('../../utils/factory/trips');
@@ -25,8 +27,17 @@ const router = new Router();
 // ---------delete
 
 router.get('/testTrips', async (ctx) => {
-  const returnObject = await getAllTrips();
-  const newBody = returnObject.map((x) => TripFactory(x));
+  const allTrips = await getAllTrips();
+  const modifiedTrips = [];
+  const modifyTrips = async (trips) => {
+    for (const trip of trips) {
+      trip.passengers = await getPassengersByTripId(trip.id);
+      trip.seatsLeft = trip.seatsTotal - trip.passengers.length;
+      modifiedTrips.push(trip);
+    }
+  };
+  await modifyTrips(allTrips);
+  const newBody = modifiedTrips.map((x) => TripFactory(x));
   ctx.body = newBody;
 });
 

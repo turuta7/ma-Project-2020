@@ -7,6 +7,7 @@ const TripFactory = ({
   startLatitude,
   startLongitude,
   seatsTotal,
+  seatsLeft,
   carId,
   model,
   license,
@@ -19,7 +20,8 @@ const TripFactory = ({
       driverId: Number(driverId),
       departureTime,
       start: [Number(startLatitude), Number(startLongitude)],
-      seatsTotal,
+      seatsTotal: Number(seatsTotal),
+      seatsLeft: Number(seatsLeft),
       car: carFactory(car),
       route: JSON.parse(route),
     };
