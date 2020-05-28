@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const DbKnex = require('../../knexfile.js')[process.env.NODE_ENV];
 
 const config = {
