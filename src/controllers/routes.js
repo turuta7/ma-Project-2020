@@ -24,4 +24,4 @@ const getRoute = async (ctx) => {
   return null;
 };
 
-module.exports = getRoute;
+module.exports = { getRoute };
