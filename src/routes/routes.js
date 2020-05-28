@@ -1,30 +1,9 @@
 const Router = require('@koa/router');
-const axios = require('axios');
+const { routes } = require('../controllers');
 
 const router = new Router();
+// Routes
 
-router.get('/', async (ctx) => {
-  try {
-    const url = await new URL(ctx.URL);
-    if (!url.search) {
-      ctx.status = 400;
-      ctx.body = { message: 'error URL' };
-      return null;
-    }
-    const newUrl = `https://route.ls.hereapi.com/routing/7.2/calculateroute.json${url.search}&apiKey=${process.env.apiKey}`;
-
-    const returnResponse = await axios.get(newUrl);
-    const { shape } = returnResponse.data.response.route[0];
-    const returnResult = shape.map((coordinates) =>
-      coordinates.split(',').map((point) => Number(point)),
-    );
-    const result = returnResult || { message: 'error URL' };
-    ctx.body = result;
-  } catch (error) {
-    ctx.status = 400;
-    ctx.body = { message: 'error URL' };
-  }
-  return null;
-});
+router.get('/', routes.getRoute);
 
 module.exports = router;
