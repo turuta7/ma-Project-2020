@@ -1,5 +1,5 @@
 const Knex = require('knex');
-const dbOptions = require('../config/config').DB.development;
+const dbOptions = require('../config/config').DB;
 
 const knex = new Knex(dbOptions);
 
@@ -156,6 +156,12 @@ const getPassengersByTripId = (id) => {
     .catch((err) => console.error(err));
 };
 
+const getAllPassengers = () => {
+  return knex('passengers')
+    .select('*')
+    .catch((err) => console.error(err));
+};
+
 module.exports = {
   getOneUserByKey,
   getAllUserByKey,
@@ -173,4 +179,5 @@ module.exports = {
   getTripsById,
   getAllTrips,
   getPassengersByTripId,
+  getAllPassengers,
 };

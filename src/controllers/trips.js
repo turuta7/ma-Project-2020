@@ -1,6 +1,5 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
-const Knex = require('knex');
 const { TripFactory, TripSchemeFactory } = require('../utils/factory/trips');
 const { subscribeFactory } = require('../utils/factory/subscribe');
 const { error500 } = require('../utils/errorProcessing');
@@ -14,11 +13,8 @@ const {
   getTripsById,
   getAllTrips,
   getPassengersByTripId,
+  getAllPassengers,
 } = require('../utils/workMethodDB');
-
-const dbOptions = require('../config/config').DB.development;
-
-const knex = new Knex(dbOptions);
 
 // ---------delete
 
@@ -38,14 +34,8 @@ const testTrips = async (ctx) => {
 };
 
 const testPassengers = async (ctx) => {
-  const getSub = () => {
-    return knex('passengers')
-      .select('*')
-      .catch((err) => console.error(err));
-  };
-  const res = await getSub();
+  const res = await getAllPassengers();
   console.log(res);
-
   ctx.body = res;
 };
 
