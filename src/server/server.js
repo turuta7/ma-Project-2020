@@ -4,8 +4,7 @@ const cors = require('@koa/cors'); // CORS support
 const morgan = require('koa-morgan'); // Log HTTP requests (Method, status, endpoint, serve time, etc...)
 const bodyParser = require('koa-bodyparser'); // Parse JSON to ctx.request.body (from raw body of POST request)
 const rootRouter = require('../routes'); // All our routes are here
-
-require('dotenv').config();
+const config = require('../config/config');
 
 async function startServer() {
   const app = new Koa();
@@ -40,9 +39,7 @@ async function startServer() {
     console.error('Something went wrong!', err);
   });
 
-  app.listen(process.env.SERVER_PORT, () =>
-    console.log(`start server port: ${process.env.SERVER_PORT}`),
-  );
+  app.listen(config.serverPort, () => console.log(`start server port: ${config.serverPort}`));
 }
 
 module.exports = startServer;
