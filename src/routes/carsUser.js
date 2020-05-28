@@ -1,13 +1,13 @@
 const Router = require('@koa/router');
-const authorizationUser = require('../../utils/authorization');
-const { carFactory } = require('../../utils/factory/cars');
-const { error500 } = require('../../utils/errorProcessing');
+const authorizationUser = require('../utils/authorization');
+const { carFactory } = require('../utils/factory/cars');
+const { error500 } = require('../utils/errorProcessing');
 const {
   getOneUserByKey,
   createCarsUser,
   getAllUserCardById,
   deleteCarsUserById,
-} = require('../../utils/workMethodDB');
+} = require('../utils/workMethodDB');
 
 const router = new Router();
 

@@ -2,9 +2,9 @@
 /* eslint-disable no-restricted-syntax */
 const Router = require('@koa/router');
 const Knex = require('knex');
-const { TripFactory, TripSchemeFactory } = require('../../utils/factory/trips');
-const { subscribeFactory } = require('../../utils/factory/subscribe');
-const { error500 } = require('../../utils/errorProcessing');
+const { TripFactory, TripSchemeFactory } = require('../utils/factory/trips');
+const { subscribeFactory } = require('../utils/factory/subscribe');
+const { error500 } = require('../utils/errorProcessing');
 // const { getOneUserCardById, getTripsById } = require('../../utils/workMethodDB');
 
 const {
@@ -16,9 +16,9 @@ const {
   getTripsById,
   getAllTrips,
   getPassengersByTripId,
-} = require('../../utils/workMethodDB');
+} = require('../utils/workMethodDB');
 
-const dbOptions = require('../../config/config').DB;
+const dbOptions = require('../config/config').DB;
 
 const knex = new Knex(dbOptions);
 

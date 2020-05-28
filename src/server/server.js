@@ -3,7 +3,7 @@ const helmet = require('koa-helmet'); // Secure your app by setting various HTTP
 const cors = require('@koa/cors'); // CORS support
 const morgan = require('koa-morgan'); // Log HTTP requests (Method, status, endpoint, serve time, etc...)
 const bodyParser = require('koa-bodyparser'); // Parse JSON to ctx.request.body (from raw body of POST request)
-const rootRouter = require('./routes'); // All our routes are here
+const rootRouter = require('../routes'); // All our routes are here
 
 require('dotenv').config();
 
