@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const config = require('../config/config')
 const { error500 } = require('../utils/errorProcessing');
 const { UserFactory, UserSchemeFactory } = require('../utils/factory/user');
 
@@ -25,7 +26,7 @@ const loginUser = async (ctx) => {
       return null;
     }
     const isValidPassword = bcrypt.compareSync(requestBody.password, user.password);
-    const token = isValidPassword ? jwt.sign({ id: user.id }, process.env.privateKeyToken) : null;
+    const token = isValidPassword ? jwt.sign({ id: user.id }, config.privateKeyToken) : null;
     ctx.status = isValidPassword ? 200 : 403;
     const newBody = UserFactory(user);
     if (token) newBody.token = token;
@@ -46,7 +47,7 @@ const createUser = async (ctx) => {
     const hashPassword = await bcrypt.hash(requestBody.password, saltRounds);
     requestBody.password = hashPassword;
     const newUser = await createUserDb(UserSchemeFactory(requestBody));
-    const token = newUser ? jwt.sign({ id: newUser.id }, process.env.privateKeyToken) : null;
+    const token = newUser ? jwt.sign({ id: newUser.id }, config.privateKeyToken) : null;
     ctx.status = newUser ? 200 : 403;
     if (token == null) {
       ctx.status = 403;

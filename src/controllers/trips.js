@@ -16,7 +16,7 @@ const {
   getPassengersByTripId,
 } = require('../utils/workMethodDB');
 
-const dbOptions = require('../config/config').DB;
+const dbOptions = require('../config/config').DB.development;
 
 const knex = new Knex(dbOptions);
 
