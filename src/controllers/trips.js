@@ -2,7 +2,6 @@
 /* eslint-disable no-restricted-syntax */
 const { TripFactory, TripSchemeFactory } = require('../utils/factory/trips');
 const { subscribeFactory } = require('../utils/factory/subscribe');
-const { error500 } = require('../utils/errorProcessing');
 
 const {
   getOneUserCardById,
@@ -61,7 +60,7 @@ const createNewTrip = async (ctx) => {
     returnObject.car = returnCar;
     ctx.body = TripFactory(returnObject);
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
 };
 
@@ -74,15 +73,13 @@ const subscribeTrip = async (ctx) => {
     const tripSeatsTotal = trip.seatsTotal;
     const passengers = await getPassengersByTripId(tripId);
     if (passengers.length >= tripSeatsTotal) {
-      ctx.status = 400;
-      ctx.body = { message: 'Sorry, free seats are over.' };
-      return null;
+      ctx.throw(400, 'Sorry, free seats are over.');
     }
     requestBody.tripId = tripId;
     const response = await createSubscribe(requestBody);
     ctx.body = subscribeFactory(response);
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
 };
 
@@ -97,7 +94,7 @@ const unsubscribeTrip = async (ctx) => {
     console.log(checkDb);
     ctx.body = { message: `subscribe: ${passengerId}, trip: ${trip_id} delete` };
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
 };
 
@@ -109,7 +106,7 @@ const deleteTrip = async (ctx) => {
     console.log(checkDb);
     ctx.body = { message: `trip ${trip_id} delete` };
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
 };
 
