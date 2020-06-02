@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const config = require('../config/config')
-const { error500 } = require('../utils/errorProcessing');
+const config = require('../config/config');
 const { UserFactory, UserSchemeFactory } = require('../utils/factory/user');
 
 const authorizationUser = require('../utils/authorization');
@@ -21,20 +20,19 @@ const loginUser = async (ctx) => {
   try {
     const user = await getOneUserByKey('email', requestBody.email, '*');
     if (user === undefined) {
-      ctx.status = 403;
-      ctx.body = { message: 'Incorrect mail' };
-      return null;
+      ctx.throw(403, 'Incorrect mail');
     }
     const isValidPassword = bcrypt.compareSync(requestBody.password, user.password);
     const token = isValidPassword ? jwt.sign({ id: user.id }, config.privateKeyToken) : null;
-    ctx.status = isValidPassword ? 200 : 403;
+    if (!isValidPassword) {
+      ctx.throw(403, 'Invalid password');
+    }
     const newBody = UserFactory(user);
     if (token) newBody.token = token;
-    ctx.body = token ? newBody : { message: 'Invalid password' };
+    ctx.body = token;
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
-  return null;
 };
 
 // Post user. return id and token (id)
@@ -48,19 +46,16 @@ const createUser = async (ctx) => {
     requestBody.password = hashPassword;
     const newUser = await createUserDb(UserSchemeFactory(requestBody));
     const token = newUser ? jwt.sign({ id: newUser.id }, config.privateKeyToken) : null;
-    ctx.status = newUser ? 200 : 403;
+    // ctx.status = newUser ? 200 : 403;
     if (token == null) {
-      ctx.status = 403;
-      ctx.body = { message: 'User in db/Incorrect data' };
-      return;
+      ctx.throw(403, 'User in db/Incorrect data');
     }
     if (token) newUser.token = token;
     const newBody = UserFactory(newUser);
     ctx.body = newBody;
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
-  //  return null;
 };
 
 // Get users
@@ -69,23 +64,19 @@ const getAllUsers = async (ctx) => {
   try {
     const autUser = await authorizationUser(ctx);
     if (!autUser.status) {
-      ctx.status = 403;
-      ctx.body = { message: 'You are not authorized' };
-      return null;
+      ctx.throw(403, 'You are not authorized');
     }
 
     const users = await getAllUserByKey();
     if (users.length === 0) {
       ctx.body = { message: 'No user DB' };
-      return null;
+      return;
     }
     const newUsers = users.map((data) => UserFactory(data));
     ctx.body = newUsers;
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
-
-  return null;
 };
 
 // Ger user by id
@@ -97,18 +88,14 @@ const getUserById = async (ctx) => {
   try {
     const autUser = await authorizationUser(ctx);
     if (!autUser.status || id !== autUser.id) {
-      ctx.status = 403;
-      ctx.body = { message: 'You are not authorized' };
-      return null;
+      ctx.throw(403, 'You are not authorized');
     }
     const user = await getOneUserByKey('id', id);
     const newUsers = UserFactory(user);
     ctx.body = newUsers;
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
-
-  return null;
 };
 
 // Update user by id
@@ -121,9 +108,7 @@ const updateUser = async (ctx) => {
   try {
     const autUser = await authorizationUser(ctx);
     if (!autUser.status || id !== autUser.id) {
-      ctx.status = 403;
-      ctx.body = { message: 'You are not authorized' };
-      return null;
+      ctx.throw(403, 'You are not authorized');
     }
     if (requestBody.password) {
       const hashPassword = await bcrypt.hash(requestBody.password, saltRounds);
@@ -139,10 +124,8 @@ const updateUser = async (ctx) => {
 
     ctx.body = returnUpdateUser;
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
-
-  return null;
 };
 
 // Delete user by id
@@ -154,9 +137,7 @@ const deleteUser = async (ctx) => {
   try {
     const autUser = await authorizationUser(ctx);
     if (!autUser.status || id !== autUser.id) {
-      ctx.status = 403;
-      ctx.body = { message: 'You are not authorized' };
-      return null;
+      ctx.throw(403, 'You are not authorized');
     }
 
     const delUser = await deleteUserByKey('id', id);
@@ -165,10 +146,8 @@ const deleteUser = async (ctx) => {
     console.log(delUser);
     ctx.body = returnDeleteUser;
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
-
-  return null;
 };
 
 module.exports = { loginUser, createUser, getUserById, getAllUsers, updateUser, deleteUser };
