@@ -1,6 +1,5 @@
 const authorizationUser = require('../utils/authorization');
 const { carFactory } = require('../utils/factory/cars');
-const { error500 } = require('../utils/errorProcessing');
 const {
   getOneUserByKey,
   createCarsUser,
@@ -15,9 +14,7 @@ const getCarsByUserId = async (ctx) => {
     // authorization user by token and by id
     const autUser = await authorizationUser(ctx);
     if (!autUser.status || Number(id) !== autUser.id) {
-      ctx.status = 403;
-      ctx.body = { message: 'You are not authorized' };
-      return null;
+      ctx.throw(403, 'You are not authorized');
     }
 
     const allCarsUser = await getAllUserCardById(id);
@@ -25,9 +22,8 @@ const getCarsByUserId = async (ctx) => {
     const returnCarsUser = returnCarFactory || { message: 'message: User no cars' };
     ctx.body = returnCarsUser;
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
-  return null;
 };
 
 const createCar = async (ctx) => {
@@ -45,7 +41,7 @@ const createCar = async (ctx) => {
       : { message: 'Invalid data' };
     ctx.body = response;
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
 };
 
@@ -55,18 +51,15 @@ const deleteCar = async (ctx) => {
     // authorization user by token and by id
     const autUser = await authorizationUser(ctx);
     if (!autUser.status || Number(id) !== autUser.id) {
-      ctx.status = 403;
-      ctx.body = { message: 'You are not authorized' };
-      return null;
+      ctx.throw(403, 'You are not authorized');
     }
 
     const testDeleteUser = await deleteCarsUserById(id, idCar);
     if (!testDeleteUser) console.error('no cars user in DB');
     ctx.body = { message: `delete car ${idCar}` };
   } catch (error) {
-    error500(ctx, error);
+    ctx.throw(error.status, error.message);
   }
-  return null;
 };
 
 module.exports = { createCar, getCarsByUserId, deleteCar };
