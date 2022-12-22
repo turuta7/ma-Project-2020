@@ -31,7 +31,7 @@
     "bcrypt": "^4.0.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "knex": "^0.20.10",
     "knex-migrate": "^1.7.4",
     "koa": "^2.11.0",
